@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang chủ | Sonct's Vault</title>
+    
+    <!-- Tailwind CSS (Kèm plugin Typography để render Markdown đẹp) -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- Marked.js (Thư viện dịch Markdown sang HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#faf5ff',
+                            100: '#f3e8ff',
+                            500: '#a855f7',
+                            600: '#9333ea',
+                            900: '#581c87',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Toast Animation */
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideUp 0.3s ease-out forwards;
+        }
+
+        /* Custom Scrollbar cho Sidebar giống GitBook */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-white text-slate-800 font-sans antialiased overflow-hidden">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 hidden z-50 transition-opacity duration-300">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span id="toast-message">Đã sao chép!</span>
+    </div>
+
+    <!-- Bố cục Flexbox chính -->
+    <div class="flex h-screen w-full">
+
+        <!-- Lớp phủ tối màu khi mở menu trên Mobile -->
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity duration-300"></div>
+
+        <!-- CỘT TRÁI: SIDEBAR (GitBook Style) -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 border-r border-slate-200 transform -translate-x-full md:translate-x-0 md:relative md:hidden transition-all duration-300 ease-in-out flex flex-col shrink-0">
+            
+            <!-- Khung cuộn Menu -->
+            <nav class="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar pb-6 mt-4">
+                
+                <!-- Link Trang chủ -->
+                <a href="/" id="menu-home" onclick="loadHome(true); return false;" class="menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50">
+                    <i class="fas fa-home w-5 text-center text-slate-400 group-hover:text-brand-500 transition-colors text-sm"></i>
+                    <span class="text-sm font-medium">Trang chủ</span>
+                </a>
+
+                <!-- Folder: Document -->
+                <div class="mt-4">
+                    <!-- Nút đóng/mở Folder -->
+                    <button onclick="toggleFolder()" class="w-full flex items-center justify-between px-2 py-1.5 text-slate-600 hover:bg-slate-200/50 rounded-md transition-colors group">
+                        <span class="text-sm font-medium">Document</span>
+                        <i id="folder-icon" class="fas fa-chevron-down text-[10px] text-slate-400 group-hover:text-slate-600 transition-transform duration-200"></i>
+                    </button>
+                    
+                    <!-- Nội dung bên trong Folder -->
+                    <div id="folder-content" class="mt-1 ml-4 pl-3 border-l border-slate-200 space-y-0.5 relative">
+                        
+                        <!-- Items -->
+                        <a href="/adguard-pro" id="menu-adguard" onclick="loadMarkdown('Document/adguard-pro.md', 'menu-adguard', 'adguard-pro', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                            Hướng dẫn cấu hình Adguard
+                        </a>
+                        
+                        <a href="/decoding-the-benefits-of-playing-hui" id="menu-hui" onclick="loadMarkdown('Document/decoding-the-benefits-of-playing-hui.md', 'menu-hui', 'decoding-the-benefits-of-playing-hui', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                            Giải Mã Lợi Nhuận Chơi Hụi
+                        </a>
+                        
+                        <a href="/important-trading-P2P" id="menu-p2p" onclick="loadMarkdown('Document/important-trading-P2P.md', 'menu-p2p', 'important-trading-P2P', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                            Các lưu ý khi giao dịch P2P
+                        </a>
+                        
+                        <a href="/iphone-security-setup-guide" id="menu-iphone" onclick="loadMarkdown('Document/iphone-security-setup-guide.md', 'menu-iphone', 'iphone-security-setup-guide', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                            Thiết lập bảo mật iPhone
+                        </a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- CỘT PHẢI: NỘI DUNG CHÍNH (Có thể cuộn) -->
+        <div class="flex-1 flex flex-col min-w-0 h-screen bg-slate-50/30">
+            
+            <!-- Universal Header (Desktop & Mobile) -->
+            <div class="flex items-center justify-between px-4 py-3 bg-white/90 backdrop-blur-md border-b border-slate-200 z-30 sticky top-0 shrink-0">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors" title="Đóng/Mở Menu">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vùng cuộn chứa toàn bộ giao diện bài viết -->
+            <div id="scroll-container" class="flex-1 overflow-y-auto w-full relative scroll-smooth">
+                
+                <!-- VÙNG 1: TRANG CHỦ (Mặc định hiện) -->
+                <div id="home-content" class="w-full">
+                    <!-- Header / Cover Image -->
+                    <header class="w-full h-56 md:h-72 bg-cover bg-center relative" style="background-image: url('https://i.imgur.com/VrYNuWo.jpeg');">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/80"></div>
+                    </header>
+
+                    <!-- Main Content Trang Chủ -->
+                    <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10 pb-16">
+                        
+                        <!-- Intro Card -->
+                        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-slate-100">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl shadow-sm overflow-hidden shrink-0">
+                                    <img src="https://i.imgur.com/qkE7bQz.png" alt="Sonct's Vault" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Sonct's Vault</h1>
+                                    <p class="text-slate-500 font-medium mt-1">Kho lưu trữ cá nhân của <span class="text-brand-600 font-bold">Sonct</span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
+                                <p class="mb-4">
+                                    Chào mừng bạn bước vào <strong>Sonct's Vault</strong>! Đây là nơi lưu trữ và chia sẻ các tài liệu, kiến thức được ghi chép hàng ngày từ ứng dụng Obsidian.
+                                </p>
+                                <p class="bg-purple-50 text-purple-800 p-4 rounded-xl border border-purple-100 text-base font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> <strong>Lưu ý:</strong> Bạn có thể thấy một số các bài viết khác không liên quan đến nội dung bạn được chia sẻ, hãy bỏ qua chúng nếu bạn không quan tâm nhé.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Liên hệ & Ủng hộ -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                            <!-- Contact Section -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
+                                <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                    <i class="fas fa-address-book text-brand-500"></i>
+                                    Thông tin liên hệ
+                                </h2>
+                                <div class="space-y-4 flex-grow">
+                                    <a href="https://t.me/sonct988" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-blue-50 hover:bg-blue-500 transition-colors duration-300 border border-blue-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-blue-100 group-hover:bg-white/20 flex items-center justify-center text-blue-500 group-hover:text-white transition-colors">
+                                                <i class="fab fa-telegram-plane text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-blue-600/80 group-hover:text-blue-100 font-medium uppercase tracking-wider">Telegram</p>
+                                                <p class="text-blue-900 group-hover:text-white font-semibold">@sonct988</p>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-external-link-alt text-blue-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
+
+                                    <div class="group flex items-center justify-between p-4 rounded-xl bg-indigo-50 hover:bg-indigo-500 transition-colors duration-300 border border-indigo-100 cursor-pointer" onclick="copyText('@sonct', 'Tên Discord')">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-indigo-100 group-hover:bg-white/20 flex items-center justify-center text-indigo-500 group-hover:text-white transition-colors">
+                                                <i class="fab fa-discord text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-indigo-600/80 group-hover:text-indigo-100 font-medium uppercase tracking-wider">Discord</p>
+                                                <p class="text-indigo-900 group-hover:text-white font-semibold">@sonct</p>
+                                            </div>
+                                        </div>
+                                        <button class="text-indigo-400 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Donate Section -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
+                                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-coffee text-amber-500"></i>
+                                    Ủng hộ
+                                </h2>
+                                <p class="text-slate-500 text-sm mb-6">
+                                    Nếu bạn thấy thứ gì đó hữu ích và muốn ủng hộ, hãy mời mình một ly trà đá nhé! ❤️
+                                </p>
+                                <div class="space-y-4 flex-grow">
+                                    <div class="group flex items-center justify-between p-4 rounded-xl bg-green-50 hover:bg-green-500 transition-colors duration-300 border border-green-100 cursor-pointer" onclick="copyText('0904211988', 'Số tài khoản')">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-green-100 group-hover:bg-white/20 flex items-center justify-center text-green-600 group-hover:text-white transition-colors">
+                                                <i class="fas fa-building-columns text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-green-700/80 group-hover:text-green-100 font-medium uppercase tracking-wider">Vietinbank</p>
+                                                <p class="text-green-900 group-hover:text-white font-semibold text-lg tracking-wide">0904 211 988</p>
+                                            </div>
+                                        </div>
+                                        <button class="text-green-500 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+
+                                    <a href="https://paypal.me/sonct" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-sky-50 hover:bg-[#00457C] transition-colors duration-300 border border-sky-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-sky-100 group-hover:bg-white/20 flex items-center justify-center text-[#0079C1] group-hover:text-white transition-colors">
+                                                <i class="fab fa-paypal text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-sky-700/80 group-hover:text-sky-200 font-medium uppercase tracking-wider">Paypal</p>
+                                                <p class="text-sky-900 group-hover:text-white font-semibold">paypal.me/sonct</p>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-external-link-alt text-sky-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+
+                <!-- VÙNG 2: HIỂN THỊ MARKDOWN (Mặc định ẩn) -->
+                <div id="markdown-container" class="hidden w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+                        
+                        <!-- Banner Image cho Markdown -->
+                        <div id="markdown-banner" class="w-full h-48 md:h-64 bg-cover bg-center hidden border-b border-slate-100"></div>
+                        
+                        <!-- Cấu hình chuẩn Tailwind Typography để CSS cho Markdown -->
+                        <div class="p-8 md:p-12">
+                            <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800">
+                                <!-- Nội dung bài viết sẽ được JS nhúng vào đây -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <footer class="text-center py-6 text-slate-400 text-sm mt-auto border-t border-slate-200/60 bg-white">
+                    <p>&copy; 2026 Sonct's Vault.</p>
+                </footer>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // KIỂM TRA ĐƯỜNG DẪN KHI VỪA VÀO TRANG (Xử lý F5 / Load trực tiếp URL)
+        window.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname.replace(/^\//, ''); // Bỏ dấu / ở đầu
+            
+            if (path === 'adguard-pro') {
+                loadMarkdown('Document/adguard-pro.md', 'menu-adguard', path, false);
+            } else if (path === 'decoding-the-benefits-of-playing-hui') {
+                loadMarkdown('Document/decoding-the-benefits-of-playing-hui.md', 'menu-hui', path, false);
+            } else if (path === 'important-trading-P2P') {
+                loadMarkdown('Document/important-trading-P2P.md', 'menu-p2p', path, false);
+            } else if (path === 'iphone-security-setup-guide') {
+                loadMarkdown('Document/iphone-security-setup-guide.md', 'menu-iphone', path, false);
+            } else {
+                loadHome(false);
+            }
+        });
+
+        // LẮNG NGHE SỰ KIỆN NÚT BACK / FORWARD CỦA TRÌNH DUYỆT
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.file) {
+                loadMarkdown(event.state.file, event.state.id, null, false);
+            } else {
+                loadHome(false);
+            }
+        });
+
+        // CẤU HÌNH VÀ XỬ LÝ CLICK ĐỘNG
+        function resetMenu() {
+            // Đặt lại trang chủ về mặc định
+            const homeBtn = document.getElementById('menu-home');
+            homeBtn.className = 'menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-slate-600 hover:bg-slate-200/50';
+            
+            // Đặt lại tất cả các item trong folder về mặc định
+            const folderItems = document.querySelectorAll('.folder-item');
+            folderItems.forEach(item => {
+                item.className = 'menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border-transparent -ml-[1px]';
+            });
+        }
+
+        function loadHome(pushState = true) {
+            resetMenu();
+            // Đổi URL trên trình duyệt
+            if (pushState) {
+                window.history.pushState({ home: true }, '', '/');
+            }
+
+            // Highlight nút trang chủ
+            const homeBtn = document.getElementById('menu-home');
+            homeBtn.className = 'menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50';
+            homeBtn.querySelector('i').classList.replace('text-slate-400', 'text-brand-500');
+            
+            // Hiện Trang Chủ, Ẩn Khung Markdown
+            document.getElementById('home-content').classList.remove('hidden');
+            document.getElementById('markdown-container').classList.add('hidden');
+            
+            // Cuộn lên đầu
+            document.getElementById('scroll-container').scrollTo(0, 0);
+
+            // Tự đóng menu trên điện thoại
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        async function loadMarkdown(filename, elementId, pathUrl, pushState = true) {
+            resetMenu();
+            
+            // Đổi URL trên trình duyệt
+            if (pushState && pathUrl) {
+                window.history.pushState({ file: filename, id: elementId }, '', '/' + pathUrl);
+            }
+
+            // Đặt lại icon trang chủ thành xám
+            document.querySelector('#menu-home i').classList.replace('text-brand-500', 'text-slate-400');
+
+            // Highlight nút vừa click
+            const activeItem = document.getElementById(elementId);
+            if (activeItem) {
+                activeItem.className = 'menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l font-medium text-brand-600 bg-brand-50/50 hover:bg-brand-50 border-brand-500 -ml-[1.5px] border-l-[3px]';
+            }
+
+            // Mở thư mục chứa nút đó (nếu đang đóng)
+            document.getElementById('folder-content').classList.remove('hidden');
+            document.getElementById('folder-icon').classList.add('-rotate-90');
+
+            // Ẩn Trang Chủ, Hiện Khung Markdown
+            const homeContent = document.getElementById('home-content');
+            const markdownContainer = document.getElementById('markdown-container');
+            const markdownContent = document.getElementById('markdown-content');
+            const markdownBanner = document.getElementById('markdown-banner');
+
+            homeContent.classList.add('hidden');
+            markdownContainer.classList.remove('hidden');
+            
+            // Hiển thị vòng quay loading
+            markdownContent.innerHTML = '<div class="flex justify-center items-center h-40"><i class="fas fa-spinner fa-spin text-3xl text-brand-500"></i></div>';
+            markdownBanner.classList.add('hidden'); // Ẩn banner cũ chờ load
+
+            try {
+                // 1. Đầu tiên thử gọi tải file tương đối 
+                let response = await fetch(encodeURI(filename));
+                
+                // 2. Nếu Github Pages (Jekyll) đã ẩn file .md đi, ta gọi trực tiếp source file RAW trên Github
+                if (!response.ok) {
+                    const rawUrl = 'https://raw.githubusercontent.com/sonct988/sonct988.github.io/main/' + filename;
+                    response = await fetch(encodeURI(rawUrl));
+                }
+
+                if (!response.ok) throw new Error('Không tìm thấy file');
+                const text = await response.text();
+                
+                // TRÍCH XUẤT ẢNH BANNER/COVER TỪ FRONTMATTER YAML
+                let bannerImgUrl = '';
+                const frontmatterMatch = text.match(/^---[\s\S]+?---\n/);
+                if (frontmatterMatch) {
+                    const frontmatter = frontmatterMatch[0];
+                    // Tìm dòng cover: hoặc banner: lấy đường link phía sau
+                    const imgMatch = frontmatter.match(/^(?:cover|banner):\s*(.+)$/m);
+                    if (imgMatch && imgMatch[1]) {
+                        bannerImgUrl = imgMatch[1].trim();
+                    }
+                }
+
+                // Tiền xử lý: Xóa phần YAML Header để không bị in ra chữ thô
+                const cleanText = text.replace(/^---[\s\S]+?---\n/, '');
+                
+                // Hiển thị Banner nếu có
+                if (bannerImgUrl) {
+                    markdownBanner.style.backgroundImage = `url('${bannerImgUrl}')`;
+                    markdownBanner.classList.remove('hidden');
+                }
+
+                // Dịch sang HTML bằng marked.js
+                markdownContent.innerHTML = marked.parse(cleanText);
+            } catch (error) {
+                markdownContent.innerHTML = `
+                    <div class="text-red-500 text-center py-10">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>Không thể tải nội dung.</p>
+                        <p class="text-sm text-slate-500 mt-2">Đường dẫn tệp: <b>${filename}</b></p>
+                    </div>`;
+                console.error(error);
+            }
+
+            // Cuộn lên đầu trang
+            document.getElementById('scroll-container').scrollTo(0, 0);
+
+            // Tự đóng menu trên điện thoại
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        // Logic Đóng/Mở thư mục Sidebar (Accordion)
+        function toggleFolder() {
+            const content = document.getElementById('folder-content');
+            const icon = document.getElementById('folder-icon');
+            
+            content.classList.toggle('hidden');
+            icon.classList.toggle('-rotate-90');
+        }
+
+        // Logic Mở/Đóng Sidebar trên Mobile & Desktop
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+            
+            if (window.innerWidth < 768) {
+                sidebar.classList.toggle('-translate-x-full');
+                overlay.classList.toggle('hidden');
+            } else {
+                sidebar.classList.toggle('md:hidden');
+            }
+        }
+
+        // Logic Copy văn bản
+        let toastTimeout;
+        function copyText(text, label) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            textArea.style.position = "absolute";
+            textArea.style.left = "-999999px";
+            
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`Đã sao chép ${label}!`);
+            } catch (err) {
+                showToast("Lỗi sao chép!", true);
+            } finally {
+                textArea.remove();
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+            
+            toastMessage.textContent = message;
+            
+            if (isError) {
+                icon.className = 'fas fa-exclamation-circle text-red-400';
+            } else {
+                icon.className = 'fas fa-check-circle text-green-400';
+            }
+
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-enter');
+
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('toast-enter');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
