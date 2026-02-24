@@ -26,8 +26,5 @@ banner: https://i.imgur.com/EcNRGlr.jpeg
 ![](https://i.imgur.com/qavfifH.jpeg)
 
 ## Công cụ tính lãi hụi
-> 💡 **MỞ CÔNG CỤ TÍNH LÃI HỤI TRỰC TUYẾN**
-> 
-> Để có không gian thao tác rộng rãi và trải nghiệm mượt mà nhất trên máy tính/điện thoại, vui lòng mở ứng dụng dưới đây.
-> 
-> 👉 [**BẤM VÀO ĐÂY ĐỂ KHỞI CHẠY BẢNG TÍNH ↗**](https://sonct988.github.io/benefits-of-playing-hui/)
+
+<iframe src="Tool/tool-benefits-of-playing-hui.html" width="100%" height="600px" frameborder="0"></iframe>

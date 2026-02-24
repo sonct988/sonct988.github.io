@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Công Cụ Tính Lãi Hụi Kép</title>
+    <!-- Nhúng Tailwind CSS để style -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Nhúng VueJS để xử lý logic tính toán tự động -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <!-- Nhúng thư viện Icon -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800">
+    <div id="app" class="min-h-screen p-4 md:p-8">
+        <div class="max-w-6xl mx-auto space-y-6">
+            
+            <!-- Header -->
+            <div class="bg-emerald-600 rounded-2xl p-6 md:p-8 text-white shadow-lg flex flex-col md:flex-row items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-extrabold flex items-center gap-3">
+                        <i data-lucide="calculator" class="w-9 h-9 text-emerald-200"></i>
+                        Công Cụ Tính Lãi Hụi (Kép)
+                    </h1>
+                    <p class="text-emerald-100 mt-2 text-lg">Thay đổi các con số bên dưới để xem kết quả tính toán tức thì.</p>
+                </div>
+                <div class="mt-4 md:mt-0 bg-emerald-700/50 p-4 rounded-xl text-center backdrop-blur-sm border border-emerald-500">
+                    <p class="text-sm text-emerald-100 mb-1">Tổng Lợi Nhuận Dự Kiến</p>
+                    <p class="text-3xl font-bold text-yellow-300">{{ formatCurrency(tongLoiNhuan) }}</p>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-6">
+                
+                <!-- CỘT TRÁI: FORM NHẬP LIỆU -->
+                <div class="lg:col-span-4 bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <h2 class="text-xl font-bold text-slate-800 border-b pb-4 mb-4 flex items-center gap-2">
+                        <i data-lucide="dollar-sign" class="text-emerald-500"></i> Thông Số Đầu Vào
+                    </h2>
+                    
+                    <div class="space-y-4">
+                        <!-- Group 1: Quy mô -->
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tổng số phần</label>
+                                <input type="number" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" v-model.number="tongSoPhan">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Mệnh giá mỗi phần (VNĐ)</label>
+                                <input type="number" step="100000" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 outline-none transition" v-model.number="menhGia">
+                                <p class="text-xs text-slate-500 mt-1 text-right">{{ formatCurrency(menhGia) }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Quá khứ -->
+                        <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Số phần ĐÃ đóng (Hụi chết)</label>
+                                <input type="number" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" v-model.number="soPhanDaDong">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tổng tiền THỰC TẾ đã đóng (Vốn)</label>
+                                <input type="number" step="1000000" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition" v-model.number="tongTienDaDong">
+                                <p class="text-xs text-slate-500 mt-1 text-right">{{ formatCurrency(tongTienDaDong) }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Group 3: Kỳ hốt -->
+                        <div class="p-4 bg-amber-50 rounded-xl border border-amber-100 space-y-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Giá kêu hốt kỳ này (VNĐ)</label>
+                                <input type="number" step="100000" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition" v-model.number="giaHot">
+                                <p class="text-xs text-slate-500 mt-1 text-right">{{ formatCurrency(giaHot) }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Tiền hoa hồng / Tiền Thảo (VNĐ)</label>
+                                <input type="number" step="100000" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition" v-model.number="hoaHong">
+                                <p class="text-xs text-slate-500 mt-1 text-right">{{ formatCurrency(hoaHong) }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 mb-1">Lãi suất Ngân hàng (%/năm)</label>
+                                <div class="relative">
+                                    <input type="number" step="0.1" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-amber-500 outline-none transition" v-model.number="laiSuat">
+                                    <span class="absolute right-3 top-2.5 text-slate-400 font-bold">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CỘT PHẢI: KẾT QUẢ TÍNH TOÁN -->
+                <div class="lg:col-span-8 space-y-6">
+                    
+                    <!-- Bước 1: Tiền hốt thu về -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                        <div class="bg-slate-50 border-b border-slate-200 p-4 md:p-6 flex items-center gap-3">
+                            <div class="bg-blue-100 p-2 rounded-lg"><i data-lucide="wallet" class="text-blue-600"></i></div>
+                            <h2 class="text-xl font-bold text-slate-800">Bước 1: Số Tiền Thực Nhận (Mẻ lưới)</h2>
+                        </div>
+                        <div class="p-4 md:p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div class="flex justify-between items-center text-sm border-b pb-2">
+                                    <span class="text-slate-500">Thu từ {{ soPhanDaDong }} phần chết (100% giá)</span>
+                                    <span class="font-semibold">{{ formatCurrency(thuTuHuiChet) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm border-b pb-2">
+                                    <span class="text-slate-500">Thu từ {{ soPhanConLai }} phần sống (Theo giá hốt)</span>
+                                    <span class="font-semibold">{{ formatCurrency(thuTuHuiSong) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm font-medium">
+                                    <span class="text-slate-600">Tổng tiền gom được</span>
+                                    <span class="text-slate-800">{{ formatCurrency(tongTienGom) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center text-sm font-medium text-red-500">
+                                    <span>Trừ đi Hoa hồng</span>
+                                    <span>- {{ formatCurrency(hoaHong) }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-emerald-50 border border-emerald-100 rounded-xl p-4 flex flex-col justify-center items-center text-center">
+                                <p class="text-emerald-700 font-medium mb-1">Số tiền mặt đem gửi Bank</p>
+                                <p class="text-3xl font-extrabold text-emerald-600">{{ formatCurrency(thucNhan) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 2: Dòng tiền gửi Bank -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden relative">
+                        <!-- Mũi tên nối -->
+                        <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white rounded-full">
+                            <i data-lucide="arrow-down-circle" class="text-emerald-400 w-8 h-8"></i>
+                        </div>
+                        
+                        <div class="bg-slate-50 border-b border-slate-200 p-4 md:p-6 flex items-center gap-3">
+                            <div class="bg-amber-100 p-2 rounded-lg"><i data-lucide="landmark" class="text-amber-600"></i></div>
+                            <h2 class="text-xl font-bold text-slate-800">Bước 2: Dòng Tiền Lãi Ngân Hàng Kép</h2>
+                        </div>
+                        
+                        <div class="p-4 md:p-6">
+                            <p class="text-sm text-slate-600 mb-6 bg-amber-50 p-3 rounded-lg border border-amber-100">
+                                Gửi toàn bộ <strong>{{ formatCurrency(thucNhan) }}</strong> vào ngân hàng ({{ laiSuat }}%/năm) để lấy lãi hàng tháng bù vào khoản <strong>{{ formatCurrency(menhGia) }}</strong> phải đóng hụi sống.
+                            </p>
+                            
+                            <div class="grid md:grid-cols-3 gap-4">
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                                    <p class="text-slate-500 text-sm mb-1">Lãi Bank nhận mỗi tháng</p>
+                                    <p class="text-xl font-bold text-blue-600">+{{ formatCurrency(laiNganHangThang) }}</p>
+                                </div>
+                                <div class="flex items-center justify-center text-slate-300">
+                                    <i data-lucide="arrow-right" class="w-6 h-6 rotate-90 md:rotate-0"></i>
+                                </div>
+                                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-center">
+                                    <p class="text-slate-500 text-sm mb-1">Móc hầu bao ra bù</p>
+                                    <p class="text-xl font-bold text-red-600">-{{ formatCurrency(tienTuiThucTePhaiBu) }}</p>
+                                    <p class="text-xs text-slate-400 mt-1">({{ formatCurrency(menhGia) }} - Lãi Bank)</p>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 bg-blue-50 border border-blue-100 p-4 rounded-xl flex justify-between items-center">
+                                <div>
+                                    <p class="font-semibold text-blue-800">Lãi ròng dòng tiền HÀNG THÁNG</p>
+                                    <p class="text-xs text-blue-600 mt-1">Giá kêu hốt ({{ formatCurrency(giaHot) }}) - Mức tiền túi phải bù</p>
+                                </div>
+                                <p class="text-2xl font-bold text-blue-600">+{{ formatCurrency(laiDongTienThang) }}/tháng</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bước 3: Tổng kết lợi nhuận -->
+                    <div class="bg-slate-800 text-white rounded-2xl shadow-lg p-6 md:p-8">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="bg-slate-700 p-2 rounded-lg"><i data-lucide="pie-chart" class="text-emerald-400"></i></div>
+                            <h2 class="text-2xl font-bold">Tổng Kết Trận Đánh</h2>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="space-y-4 border-r border-slate-700 pr-4">
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-slate-400">Lãi từ {{ soPhanDaDong }} phần hụi chết:</span>
+                                    <span class="font-semibold text-emerald-400">+{{ formatCurrency(laiQuaKhu) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center border-b border-slate-700 pb-2">
+                                    <span class="text-slate-400">Lãi dòng tiền tương lai ({{ soPhanConLai }} tháng):</span>
+                                    <span class="font-semibold text-emerald-400">+{{ formatCurrency(laiTuongLai) }}</span>
+                                </div>
+                                <div class="flex justify-between items-center pt-2">
+                                    <span class="text-lg font-bold">Tổng lợi nhuận:</span>
+                                    <span class="text-2xl font-bold text-emerald-400">={{ formatCurrency(tongLoiNhuan) }}</span>
+                                </div>
+                            </div>
+
+                            <div class="flex flex-col justify-center items-center bg-slate-900 rounded-xl p-6 border border-slate-700">
+                                <i data-lucide="percent" class="text-yellow-400 w-10 h-10 mb-2"></i>
+                                <p class="text-slate-400 font-medium mb-1">Tỷ Suất Lợi Nhuận</p>
+                                <p class="text-5xl font-black text-yellow-400">{{ tySuatSinhLoi.toFixed(2) }}%</p>
+                                <p class="text-sm text-slate-500 mt-2">Tính trên vốn đã đóng {{ formatCurrency(tongTienDaDong) }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script VueJS Logic -->
+    <script>
+        const { createApp, ref, computed, onMounted, onUpdated } = Vue;
+
+        createApp({
+            setup() {
+                // Khởi tạo các state (biến) giống hệt React
+                const tongSoPhan = ref(33);
+                const menhGia = ref(5000000);
+                const soPhanDaDong = ref(15);
+                const tongTienDaDong = ref(62100000);
+                const giaHot = ref(4300000);
+                const hoaHong = ref(1500000);
+                const laiSuat = ref(7);
+
+                // Các phép tính toán tự động
+                const soPhanConLai = computed(() => Math.max(0, tongSoPhan.value - soPhanDaDong.value - 1));
+                const thuTuHuiChet = computed(() => soPhanDaDong.value * menhGia.value);
+                const thuTuHuiSong = computed(() => soPhanConLai.value * giaHot.value);
+                const tongTienGom = computed(() => thuTuHuiChet.value + thuTuHuiSong.value);
+                const thucNhan = computed(() => tongTienGom.value - hoaHong.value);
+
+                const laiNganHangThang = computed(() => thucNhan.value * (laiSuat.value / 100) / 12);
+                const tienTuiThucTePhaiBu = computed(() => menhGia.value - laiNganHangThang.value);
+                const laiDongTienThang = computed(() => giaHot.value - tienTuiThucTePhaiBu.value);
+
+                const laiQuaKhu = computed(() => thuTuHuiChet.value - tongTienDaDong.value);
+                const laiTuongLai = computed(() => laiDongTienThang.value * soPhanConLai.value);
+                const tongLoiNhuan = computed(() => laiQuaKhu.value + laiTuongLai.value);
+                const tySuatSinhLoi = computed(() => tongTienDaDong.value > 0 ? (tongLoiNhuan.value / tongTienDaDong.value) * 100 : 0);
+
+                const formatCurrency = (value) => {
+                    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Math.round(value));
+                };
+
+                // Render Icon Lucide
+                onMounted(() => { lucide.createIcons(); });
+                onUpdated(() => { lucide.createIcons(); });
+
+                return {
+                    tongSoPhan, menhGia, soPhanDaDong, tongTienDaDong, giaHot, hoaHong, laiSuat,
+                    soPhanConLai, thuTuHuiChet, thuTuHuiSong, tongTienGom, thucNhan,
+                    laiNganHangThang, tienTuiThucTePhaiBu, laiDongTienThang,
+                    laiQuaKhu, laiTuongLai, tongLoiNhuan, tySuatSinhLoi,
+                    formatCurrency
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
