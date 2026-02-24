@@ -100,10 +100,10 @@
     <div class="flex h-screen w-full relative">
 
         <!-- Lớp phủ tối màu khi mở menu TRÁI trên Mobile -->
-        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity duration-300"></div>
+        <div id="sidebar-overlay" onclick="closeMobileSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity duration-300 cursor-pointer"></div>
 
         <!-- Lớp phủ tối màu khi mở mục lục (PHẢI) trên Mobile/Tablet -->
-        <div id="outline-overlay" onclick="toggleOutline()" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"></div>
+        <div id="outline-overlay" onclick="toggleOutline()" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300 cursor-pointer"></div>
 
         <!-- CỘT TRÁI: SIDEBAR (GitBook Style) -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 border-r border-slate-200 transform -translate-x-full md:translate-x-0 md:relative md:hidden transition-all duration-300 ease-in-out flex flex-col shrink-0">
@@ -155,8 +155,8 @@
                         <i class="fas fa-bars"></i>
                     </button>
                 </div>
-                <!-- Nút ẩn hiện Outline (chỉ hiển thị khi đang đọc Markdown) -->
-                <button id="btn-outline-toggle" onclick="toggleOutline()" class="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors hidden" title="Mục lục bài viết">
+                <!-- Nút ẩn hiện Outline (chỉ hiển thị trên Mobile/Tablet) -->
+                <button id="btn-outline-toggle" onclick="toggleOutline()" class="p-2 text-slate-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors hidden lg:hidden" title="Mục lục bài viết">
                     <i class="fas fa-list-ul"></i>
                 </button>
             </div>
@@ -276,7 +276,7 @@
                         </div>
 
                         <!-- Cột Mục Lục (Outline / TOC) -->
-                        <aside id="outline-sidebar" class="fixed inset-y-0 right-0 z-50 w-[280px] bg-white border-l border-slate-200 transform translate-x-full lg:translate-x-0 lg:relative lg:w-64 lg:bg-transparent lg:border-0 lg:sticky lg:top-6 transition-transform duration-300 ease-in-out shrink-0">
+                        <aside id="outline-sidebar" class="fixed inset-y-0 right-0 z-50 w-[280px] bg-white border-l border-slate-200 transform translate-x-full transition-transform duration-300 ease-in-out shrink-0 lg:translate-x-0 lg:w-64 lg:bg-transparent lg:border-0 lg:sticky lg:top-6 lg:bottom-auto lg:h-[calc(100vh-3rem)]">
                             <div class="p-5 lg:p-0 h-full flex flex-col">
                                 <div class="flex items-center justify-between mb-4 border-b border-slate-100 lg:border-0 pb-3 lg:pb-0">
                                     <h3 class="font-bold text-slate-800 flex items-center gap-2">
@@ -289,7 +289,7 @@
                                 </div>
                                 
                                 <!-- Nội dung mục lục sẽ tự động tạo vào đây -->
-                                <div id="outline-content" class="flex-1 lg:max-h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar pr-2 pl-3">
+                                <div id="outline-content" class="flex-1 overflow-y-auto custom-scrollbar pr-2 pl-3">
                                 </div>
                             </div>
                         </aside>
@@ -369,7 +369,7 @@
             document.getElementById('btn-outline-toggle').classList.add('hidden'); // Ẩn nút mục lục
             
             document.getElementById('scroll-container').scrollTo(0, 0);
-            if(window.innerWidth < 768) toggleSidebar();
+            closeMobileSidebar();
         }
 
         async function loadMarkdown(filename, elementId, pathUrl, pushState = true) {
@@ -402,13 +402,13 @@
                 const text = await response.text();
                 
                 let bannerImgUrl = '';
-                const frontmatterMatch = text.match(/^---[\s\S]+?---\n/);
+                const frontmatterMatch = text.match(/^---[\s\S]+?---\r?\n/);
                 if (frontmatterMatch) {
                     const imgMatch = frontmatterMatch[0].match(/^(?:cover|banner):\s*(.+)$/m);
                     if (imgMatch && imgMatch[1]) bannerImgUrl = imgMatch[1].trim();
                 }
 
-                const cleanText = text.replace(/^---[\s\S]+?---\n/, '');
+                const cleanText = text.replace(/^---[\s\S]+?---\r?\n/, '');
                 
                 if (bannerImgUrl) {
                     markdownBanner.style.backgroundImage = `url('${bannerImgUrl}')`;
@@ -426,7 +426,7 @@
             }
 
             document.getElementById('scroll-container').scrollTo(0, 0);
-            if(window.innerWidth < 768) toggleSidebar();
+            closeMobileSidebar();
         }
 
         // HÀM TẠO MỤC LỤC
@@ -458,9 +458,12 @@
 
                 a.onclick = (e) => {
                     e.preventDefault();
-                    // Cuộn thủ công mượt mà
-                    document.getElementById('scroll-container').scrollTo({
-                        top: header.offsetTop - 20, 
+                    // Tính toán vị trí cuộn chính xác
+                    const container = document.getElementById('scroll-container');
+                    const offset = header.getBoundingClientRect().top + container.scrollTop - container.getBoundingClientRect().top - 20;
+                    
+                    container.scrollTo({
+                        top: offset, 
                         behavior: 'smooth'
                     });
                     if(window.innerWidth < 1024) toggleOutline(); // Đóng outline trên mobile sau khi ấn
@@ -470,6 +473,16 @@
                 ul.appendChild(li);
             });
             outlineContainer.appendChild(ul);
+        }
+
+        // Đóng Sidebar trên Mobile
+        function closeMobileSidebar() {
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('sidebar-overlay');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
 
         // Toggle Sidebar TRÁI
@@ -489,11 +502,9 @@
             const sidebar = document.getElementById('outline-sidebar');
             const overlay = document.getElementById('outline-overlay');
             
-            if (window.innerWidth < 1024) { // Mobile / Tablet / màn hình Canvas Preview
+            if (window.innerWidth < 1024) { // Mobile / Tablet 
                 sidebar.classList.toggle('translate-x-full');
                 overlay.classList.toggle('hidden');
-            } else { // Desktop rộng
-                sidebar.classList.toggle('lg:hidden');
             }
         }
 
