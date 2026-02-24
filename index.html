@@ -102,8 +102,8 @@
         <!-- Lớp phủ tối màu khi mở menu TRÁI trên Mobile -->
         <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 hidden md:hidden backdrop-blur-sm transition-opacity duration-300"></div>
 
-        <!-- Lớp phủ tối màu khi mở mục lục (PHẢI) trên Mobile -->
-        <div id="outline-overlay" onclick="toggleOutline()" class="fixed inset-0 bg-slate-900/50 z-40 hidden xl:hidden backdrop-blur-sm transition-opacity duration-300"></div>
+        <!-- Lớp phủ tối màu khi mở mục lục (PHẢI) trên Mobile/Tablet -->
+        <div id="outline-overlay" onclick="toggleOutline()" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden backdrop-blur-sm transition-opacity duration-300"></div>
 
         <!-- CỘT TRÁI: SIDEBAR (GitBook Style) -->
         <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-[280px] bg-slate-50 border-r border-slate-200 transform -translate-x-full md:translate-x-0 md:relative md:hidden transition-all duration-300 ease-in-out flex flex-col shrink-0">
@@ -261,7 +261,7 @@
                 <div id="markdown-container" class="hidden w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                     
                     <!-- Bố cục lưới: Nội dung (Trái) & Mục lục (Phải) -->
-                    <div class="flex flex-col xl:flex-row gap-8 items-start relative">
+                    <div class="flex flex-col lg:flex-row gap-8 items-start relative">
                         
                         <!-- Box Bài Viết -->
                         <div class="flex-1 w-full max-w-4xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
@@ -273,27 +273,27 @@
                                 <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800 scroll-mt-20">
                                 </div>
 
-                                <!-- Custom Tool (Nhúng iframe tool chơi hụi) -->
+                                <!-- Custom Tool (Nhúng iframe hoặc link mở ngoài) -->
                                 <div id="custom-tool-container" class="hidden mt-12 pt-10 border-t border-slate-200">
                                 </div>
                             </div>
                         </div>
 
                         <!-- Cột Mục Lục (Outline / TOC) -->
-                        <aside id="outline-sidebar" class="fixed inset-y-0 right-0 z-50 w-[280px] bg-white border-l border-slate-200 transform translate-x-full xl:translate-x-0 xl:relative xl:w-64 xl:bg-transparent xl:border-0 xl:block xl:sticky xl:top-6 transition-transform duration-300 ease-in-out shrink-0 hidden">
-                            <div class="p-5 xl:p-0 h-full flex flex-col">
-                                <div class="flex items-center justify-between mb-4 border-b border-slate-100 xl:border-0 pb-3 xl:pb-0">
+                        <aside id="outline-sidebar" class="fixed inset-y-0 right-0 z-50 w-[280px] bg-white border-l border-slate-200 transform translate-x-full lg:translate-x-0 lg:relative lg:w-64 lg:bg-transparent lg:border-0 lg:sticky lg:top-6 transition-transform duration-300 ease-in-out shrink-0">
+                            <div class="p-5 lg:p-0 h-full flex flex-col">
+                                <div class="flex items-center justify-between mb-4 border-b border-slate-100 lg:border-0 pb-3 lg:pb-0">
                                     <h3 class="font-bold text-slate-800 flex items-center gap-2">
                                         <i class="fas fa-list-ul text-brand-500 text-sm"></i> Mục lục bài viết
                                     </h3>
                                     <!-- Nút đóng trên mobile -->
-                                    <button onclick="toggleOutline()" class="text-slate-400 hover:text-slate-600 xl:hidden">
+                                    <button onclick="toggleOutline()" class="text-slate-400 hover:text-slate-600 lg:hidden">
                                         <i class="fas fa-times text-lg"></i>
                                     </button>
                                 </div>
                                 
                                 <!-- Nội dung mục lục sẽ tự động tạo vào đây -->
-                                <div id="outline-content" class="flex-1 xl:max-h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar pr-2 pl-3">
+                                <div id="outline-content" class="flex-1 lg:max-h-[calc(100vh-150px)] overflow-y-auto custom-scrollbar pr-2 pl-3">
                                 </div>
                             </div>
                         </aside>
@@ -425,20 +425,21 @@
                 // === XÂY DỰNG MỤC LỤC TỰ ĐỘNG ===
                 generateOutline();
 
-                // === NHÚNG CÔNG CỤ TÍNH TOÁN BẰNG IFRAME ===
+                // === NHÚNG NÚT MỞ CÔNG CỤ TÍNH TOÁN BÊN NGOÀI ===
                 const toolContainer = document.getElementById('custom-tool-container');
                 if (filename.includes('decoding-the-benefits-of-playing-hui')) {
                     toolContainer.innerHTML = `
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="bg-emerald-100 p-2.5 rounded-xl text-emerald-600 shadow-sm">
-                                <i class="fas fa-calculator text-lg"></i>
+                        <div class="flex flex-col items-center justify-center p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
+                            <div class="bg-emerald-200 p-4 rounded-full text-emerald-700 shadow-sm mb-4">
+                                <i class="fas fa-calculator text-2xl"></i>
                             </div>
-                            <div>
-                                <h3 class="text-xl font-bold text-slate-800">Công Cụ Mô Phỏng Lãi Hụi</h3>
-                                <p class="text-slate-500 text-sm">Bảng tính tự động tích hợp trực tiếp</p>
-                            </div>
+                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Công Cụ Mô Phỏng Lãi Hụi</h3>
+                            <p class="text-slate-600 mb-6 max-w-md mx-auto">Sử dụng bảng tính tự động để dễ dàng thay đổi các thông số và tính toán lợi nhuận trên một giao diện lớn, trực quan hơn.</p>
+                            <a href="Tool/tool-benefits-of-playing-hui.html" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200">
+                                <span>Mở Bảng Tính Toán</span>
+                                <i class="fas fa-external-link-alt text-sm"></i>
+                            </a>
                         </div>
-                        <iframe src="./tool-benefits-of-playing-hui.html" class="w-full h-[850px] border-0 rounded-2xl shadow-sm bg-slate-50 ring-1 ring-slate-200" title="Công cụ tính lãi"></iframe>
                     `;
                     toolContainer.classList.remove('hidden');
                 } else {
@@ -467,7 +468,7 @@
             }
 
             const ul = document.createElement('ul');
-            ul.className = 'space-y-3 text-sm';
+            ul.className = 'space-y-3 text-sm pb-10';
 
             headers.forEach((header, index) => {
                 if (!header.id) header.id = 'heading-' + index;
@@ -488,7 +489,7 @@
                         top: header.offsetTop - 20, 
                         behavior: 'smooth'
                     });
-                    if(window.innerWidth < 1280) toggleOutline(); // Đóng outline trên mobile sau khi ấn
+                    if(window.innerWidth < 1024) toggleOutline(); // Đóng outline trên mobile sau khi ấn
                 };
 
                 li.appendChild(a);
@@ -514,12 +515,11 @@
             const sidebar = document.getElementById('outline-sidebar');
             const overlay = document.getElementById('outline-overlay');
             
-            if (window.innerWidth < 1280) { // Mobile / Tablet
-                sidebar.classList.remove('hidden'); 
+            if (window.innerWidth < 1024) { // Mobile / Tablet / màn hình Canvas Preview
                 sidebar.classList.toggle('translate-x-full');
                 overlay.classList.toggle('hidden');
-            } else { // Desktop
-                sidebar.classList.toggle('xl:hidden');
+            } else { // Desktop rộng
+                sidebar.classList.toggle('lg:hidden');
             }
         }
 
@@ -537,3 +537,26 @@
             } catch (err) {
                 showToast("Lỗi sao chép!", true);
             } finally {
+                textArea.remove();
+            }
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toast-message');
+            const icon = toast.querySelector('i');
+            toastMessage.textContent = message;
+            if (isError) icon.className = 'fas fa-exclamation-circle text-red-400';
+            else icon.className = 'fas fa-check-circle text-green-400';
+            
+            toast.classList.remove('hidden');
+            toast.classList.add('toast-enter');
+            clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('hidden');
+                toast.classList.remove('toast-enter');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
