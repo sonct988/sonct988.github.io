@@ -272,10 +272,6 @@
                                 <!-- Nơi chứa nội dung Markdown -->
                                 <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800 scroll-mt-20">
                                 </div>
-
-                                <!-- Custom Tool (Nhúng iframe hoặc link mở ngoài) -->
-                                <div id="custom-tool-container" class="hidden mt-12 pt-10 border-t border-slate-200">
-                                </div>
                             </div>
                         </div>
 
@@ -424,28 +420,6 @@
                 
                 // === XÂY DỰNG MỤC LỤC TỰ ĐỘNG ===
                 generateOutline();
-
-                // === NHÚNG NÚT MỞ CÔNG CỤ TÍNH TOÁN BÊN NGOÀI ===
-                const toolContainer = document.getElementById('custom-tool-container');
-                if (filename.includes('decoding-the-benefits-of-playing-hui')) {
-                    toolContainer.innerHTML = `
-                        <div class="flex flex-col items-center justify-center p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center">
-                            <div class="bg-emerald-200 p-4 rounded-full text-emerald-700 shadow-sm mb-4">
-                                <i class="fas fa-calculator text-2xl"></i>
-                            </div>
-                            <h3 class="text-2xl font-bold text-slate-800 mb-2">Công Cụ Mô Phỏng Lãi Hụi</h3>
-                            <p class="text-slate-600 mb-6 max-w-md mx-auto">Sử dụng bảng tính tự động để dễ dàng thay đổi các thông số và tính toán lợi nhuận trên một giao diện lớn, trực quan hơn.</p>
-                            <a href="Tool/tool-benefits-of-playing-hui.html" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200">
-                                <span>Mở Bảng Tính Toán</span>
-                                <i class="fas fa-external-link-alt text-sm"></i>
-                            </a>
-                        </div>
-                    `;
-                    toolContainer.classList.remove('hidden');
-                } else {
-                    toolContainer.innerHTML = '';
-                    toolContainer.classList.add('hidden');
-                }
 
             } catch (error) {
                 markdownContent.innerHTML = `<div class="text-red-500 text-center py-10"><i class="fas fa-exclamation-triangle text-4xl mb-4"></i><p>Không thể tải nội dung.</p></div>`;

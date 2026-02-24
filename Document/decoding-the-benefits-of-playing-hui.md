@@ -27,4 +27,14 @@ banner: https://i.imgur.com/EcNRGlr.jpeg
 
 ## Công cụ tính lãi hụi
 
-<iframe src="Tool/tool-benefits-of-playing-hui.html" width="100%" height="600px" frameborder="0"></iframe>
+<div class="not-prose flex flex-col items-center justify-center p-8 bg-emerald-50 rounded-2xl border border-emerald-100 text-center my-8">
+<div class="bg-emerald-200 p-4 rounded-full text-emerald-700 shadow-sm mb-4 inline-block">
+<i class="fas fa-calculator text-2xl"></i>
+</div>
+<h3 class="text-2xl font-bold text-slate-800 mb-2">Công Cụ Mô Phỏng Lãi Hụi</h3>
+<p class="text-slate-600 mb-6 max-w-md mx-auto">Sử dụng bảng tính tự động để dễ dàng thay đổi các thông số và tính toán lợi nhuận trên một giao diện lớn, trực quan hơn.</p>
+<a href="Tool/tool-benefits-of-playing-hui.html" target="_blank" class="inline-flex items-center gap-2 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5 duration-200 no-underline">
+<span>Mở Bảng Tính Toán</span>
+<i class="fas fa-external-link-alt text-sm"></i>
+</a>
+</div>
