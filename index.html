@@ -63,7 +63,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-slate-800 font-sans antialiased overflow-hidden" onload="loadHome()">
+<body class="bg-white text-slate-800 font-sans antialiased overflow-hidden">
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 hidden z-50 transition-opacity duration-300">
@@ -84,7 +84,7 @@
             <nav class="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar pb-6 mt-4">
                 
                 <!-- Link Trang chủ -->
-                <a href="#" id="menu-home" onclick="loadHome(); return false;" class="menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50">
+                <a href="/" id="menu-home" onclick="loadHome(true); return false;" class="menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50">
                     <i class="fas fa-home w-5 text-center text-slate-400 group-hover:text-brand-500 transition-colors text-sm"></i>
                     <span class="text-sm font-medium">Trang chủ</span>
                 </a>
@@ -101,19 +101,19 @@
                     <div id="folder-content" class="mt-1 ml-4 pl-3 border-l border-slate-200 space-y-0.5 relative">
                         
                         <!-- Items -->
-                        <a href="#" id="menu-adguard" onclick="loadMarkdown('Document/adguard-pro.md', 'menu-adguard'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                        <a href="/adguard-pro" id="menu-adguard" onclick="loadMarkdown('Document/adguard-pro.md', 'menu-adguard', 'adguard-pro', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Hướng dẫn cấu hình Adguard
                         </a>
                         
-                        <a href="#" id="menu-hui" onclick="loadMarkdown('Document/decoding-the-benefits-of-playing-hui.md', 'menu-hui'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                        <a href="/decoding-the-benefits-of-playing-hui" id="menu-hui" onclick="loadMarkdown('Document/decoding-the-benefits-of-playing-hui.md', 'menu-hui', 'decoding-the-benefits-of-playing-hui', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Giải Mã Lợi Nhuận Chơi Hụi
                         </a>
                         
-                        <a href="#" id="menu-p2p" onclick="loadMarkdown('Document/important-trading-P2P.md', 'menu-p2p'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                        <a href="/important-trading-P2P" id="menu-p2p" onclick="loadMarkdown('Document/important-trading-P2P.md', 'menu-p2p', 'important-trading-P2P', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Các lưu ý khi giao dịch P2P
                         </a>
                         
-                        <a href="#" id="menu-iphone" onclick="loadMarkdown('Document/iphone-security-setup-guide.md', 'menu-iphone'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
+                        <a href="/iphone-security-setup-guide" id="menu-iphone" onclick="loadMarkdown('Document/iphone-security-setup-guide.md', 'menu-iphone', 'iphone-security-setup-guide', true); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Thiết lập bảo mật iPhone
                         </a>
                     </div>
@@ -252,10 +252,16 @@
 
                 <!-- VÙNG 2: HIỂN THỊ MARKDOWN (Mặc định ẩn) -->
                 <div id="markdown-container" class="hidden w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 min-h-[500px]">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden min-h-[500px]">
+                        
+                        <!-- Banner Image cho Markdown -->
+                        <div id="markdown-banner" class="w-full h-48 md:h-64 bg-cover bg-center hidden border-b border-slate-100"></div>
+                        
                         <!-- Cấu hình chuẩn Tailwind Typography để CSS cho Markdown -->
-                        <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800">
-                            <!-- Nội dung bài viết sẽ được JS nhúng vào đây -->
+                        <div class="p-8 md:p-12">
+                            <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800">
+                                <!-- Nội dung bài viết sẽ được JS nhúng vào đây -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -269,6 +275,32 @@
 
     <!-- Scripts -->
     <script>
+        // KIỂM TRA ĐƯỜNG DẪN KHI VỪA VÀO TRANG (Xử lý F5 / Load trực tiếp URL)
+        window.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname.replace(/^\//, ''); // Bỏ dấu / ở đầu
+            
+            if (path === 'adguard-pro') {
+                loadMarkdown('Document/adguard-pro.md', 'menu-adguard', path, false);
+            } else if (path === 'decoding-the-benefits-of-playing-hui') {
+                loadMarkdown('Document/decoding-the-benefits-of-playing-hui.md', 'menu-hui', path, false);
+            } else if (path === 'important-trading-P2P') {
+                loadMarkdown('Document/important-trading-P2P.md', 'menu-p2p', path, false);
+            } else if (path === 'iphone-security-setup-guide') {
+                loadMarkdown('Document/iphone-security-setup-guide.md', 'menu-iphone', path, false);
+            } else {
+                loadHome(false);
+            }
+        });
+
+        // LẮNG NGHE SỰ KIỆN NÚT BACK / FORWARD CỦA TRÌNH DUYỆT
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.file) {
+                loadMarkdown(event.state.file, event.state.id, null, false);
+            } else {
+                loadHome(false);
+            }
+        });
+
         // CẤU HÌNH VÀ XỬ LÝ CLICK ĐỘNG
         function resetMenu() {
             // Đặt lại trang chủ về mặc định
@@ -282,8 +314,13 @@
             });
         }
 
-        function loadHome() {
+        function loadHome(pushState = true) {
             resetMenu();
+            // Đổi URL trên trình duyệt
+            if (pushState) {
+                window.history.pushState({ home: true }, '', '/');
+            }
+
             // Highlight nút trang chủ
             const homeBtn = document.getElementById('menu-home');
             homeBtn.className = 'menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50';
@@ -300,8 +337,14 @@
             if(window.innerWidth < 768) toggleSidebar();
         }
 
-        async function loadMarkdown(filename, elementId) {
+        async function loadMarkdown(filename, elementId, pathUrl, pushState = true) {
             resetMenu();
+            
+            // Đổi URL trên trình duyệt
+            if (pushState && pathUrl) {
+                window.history.pushState({ file: filename, id: elementId }, '', '/' + pathUrl);
+            }
+
             // Đặt lại icon trang chủ thành xám
             document.querySelector('#menu-home i').classList.replace('text-brand-500', 'text-slate-400');
 
@@ -311,16 +354,22 @@
                 activeItem.className = 'menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l font-medium text-brand-600 bg-brand-50/50 hover:bg-brand-50 border-brand-500 -ml-[1.5px] border-l-[3px]';
             }
 
+            // Mở thư mục chứa nút đó (nếu đang đóng)
+            document.getElementById('folder-content').classList.remove('hidden');
+            document.getElementById('folder-icon').classList.add('-rotate-90');
+
             // Ẩn Trang Chủ, Hiện Khung Markdown
             const homeContent = document.getElementById('home-content');
             const markdownContainer = document.getElementById('markdown-container');
             const markdownContent = document.getElementById('markdown-content');
+            const markdownBanner = document.getElementById('markdown-banner');
 
             homeContent.classList.add('hidden');
             markdownContainer.classList.remove('hidden');
             
             // Hiển thị vòng quay loading
             markdownContent.innerHTML = '<div class="flex justify-center items-center h-40"><i class="fas fa-spinner fa-spin text-3xl text-brand-500"></i></div>';
+            markdownBanner.classList.add('hidden'); // Ẩn banner cũ chờ load
 
             try {
                 // 1. Đầu tiên thử gọi tải file tương đối 
@@ -335,9 +384,27 @@
                 if (!response.ok) throw new Error('Không tìm thấy file');
                 const text = await response.text();
                 
-                // Tiền xử lý: Xóa phần YAML Header (--- ... ---) của Obsidian để tránh render lỗi
+                // TRÍCH XUẤT ẢNH BANNER/COVER TỪ FRONTMATTER YAML
+                let bannerImgUrl = '';
+                const frontmatterMatch = text.match(/^---[\s\S]+?---\n/);
+                if (frontmatterMatch) {
+                    const frontmatter = frontmatterMatch[0];
+                    // Tìm dòng cover: hoặc banner: lấy đường link phía sau
+                    const imgMatch = frontmatter.match(/^(?:cover|banner):\s*(.+)$/m);
+                    if (imgMatch && imgMatch[1]) {
+                        bannerImgUrl = imgMatch[1].trim();
+                    }
+                }
+
+                // Tiền xử lý: Xóa phần YAML Header để không bị in ra chữ thô
                 const cleanText = text.replace(/^---[\s\S]+?---\n/, '');
                 
+                // Hiển thị Banner nếu có
+                if (bannerImgUrl) {
+                    markdownBanner.style.backgroundImage = `url('${bannerImgUrl}')`;
+                    markdownBanner.classList.remove('hidden');
+                }
+
                 // Dịch sang HTML bằng marked.js
                 markdownContent.innerHTML = marked.parse(cleanText);
             } catch (error) {
