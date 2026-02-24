@@ -323,8 +323,15 @@
             markdownContent.innerHTML = '<div class="flex justify-center items-center h-40"><i class="fas fa-spinner fa-spin text-3xl text-brand-500"></i></div>';
 
             try {
-                // Fetch file .md từ server (hoặc GitHub)
-                const response = await fetch(encodeURI(filename));
+                // 1. Đầu tiên thử gọi tải file tương đối 
+                let response = await fetch(encodeURI(filename));
+                
+                // 2. Nếu Github Pages (Jekyll) đã ẩn file .md đi, ta gọi trực tiếp source file RAW trên Github
+                if (!response.ok) {
+                    const rawUrl = 'https://raw.githubusercontent.com/sonct988/sonct988.github.io/main/' + filename;
+                    response = await fetch(encodeURI(rawUrl));
+                }
+
                 if (!response.ok) throw new Error('Không tìm thấy file');
                 const text = await response.text();
                 
@@ -338,7 +345,7 @@
                     <div class="text-red-500 text-center py-10">
                         <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
                         <p>Không thể tải nội dung.</p>
-                        <p class="text-sm text-slate-500 mt-2">Vui lòng đảm bảo file <b>${filename}</b> đã được upload lên cùng thư mục trên GitHub.</p>
+                        <p class="text-sm text-slate-500 mt-2">Đường dẫn tệp: <b>${filename}</b></p>
                     </div>`;
                 console.error(error);
             }
