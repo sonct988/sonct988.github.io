@@ -4,10 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang chủ | Sonct's Vault</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind CSS (Kèm plugin Typography để render Markdown đẹp) -->
+    <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+    
+    <!-- Marked.js (Thư viện dịch Markdown sang HTML) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
     <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -57,7 +63,7 @@
         }
     </style>
 </head>
-<body class="bg-white text-slate-800 font-sans antialiased overflow-hidden">
+<body class="bg-white text-slate-800 font-sans antialiased overflow-hidden" onload="loadHome()">
 
     <!-- Toast Notification -->
     <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 hidden z-50 transition-opacity duration-300">
@@ -78,8 +84,8 @@
             <nav class="flex-1 overflow-y-auto px-3 space-y-1 custom-scrollbar pb-6 mt-4">
                 
                 <!-- Link Trang chủ -->
-                <a href="#" class="flex items-center gap-2.5 px-2 py-1.5 text-slate-600 hover:bg-slate-200/50 rounded-md transition-colors group">
-                    <i class="fas fa-home w-5 text-center text-slate-400 group-hover:text-slate-600 transition-colors text-sm"></i>
+                <a href="#" id="menu-home" onclick="loadHome(); return false;" class="menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50">
+                    <i class="fas fa-home w-5 text-center text-slate-400 group-hover:text-brand-500 transition-colors text-sm"></i>
                     <span class="text-sm font-medium">Trang chủ</span>
                 </a>
 
@@ -94,23 +100,20 @@
                     <!-- Nội dung bên trong Folder -->
                     <div id="folder-content" class="mt-1 ml-4 pl-3 border-l border-slate-200 space-y-0.5 relative">
                         
-                        <!-- Item thường -->
-                        <a href="Adguard%20Pro.md" class="block py-1.5 pl-3 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 rounded-r-md transition-colors -ml-[1px] border-l border-transparent">
+                        <!-- Items -->
+                        <a href="#" id="menu-adguard" onclick="loadMarkdown('Adguard Pro.md', 'menu-adguard'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Hướng dẫn cấu hình Adguard
                         </a>
                         
-                        <!-- Item Đang Active (Giống trong ảnh bạn gửi) -->
-                        <a href="Decoding%20the%20Benefits%20of%20Playing%20Hui.md" class="block py-1.5 pl-3 text-sm font-medium text-brand-600 bg-brand-50/50 hover:bg-brand-50 rounded-r-md transition-colors -ml-[1.5px] border-l-[3px] border-brand-500">
+                        <a href="#" id="menu-hui" onclick="loadMarkdown('Decoding the Benefits of Playing Hui.md', 'menu-hui'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Giải Mã Lợi Nhuận Chơi Hụi
                         </a>
                         
-                        <!-- Item thường -->
-                        <a href="Important%20trading%20P2P.md" class="block py-1.5 pl-3 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 rounded-r-md transition-colors -ml-[1px] border-l border-transparent">
+                        <a href="#" id="menu-p2p" onclick="loadMarkdown('Important trading P2P.md', 'menu-p2p'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Các lưu ý khi giao dịch P2P
                         </a>
                         
-                        <!-- Item thường -->
-                        <a href="iPhone%20Security%20Setup%20Guide.md" class="block py-1.5 pl-3 text-sm text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 rounded-r-md transition-colors -ml-[1px] border-l border-transparent">
+                        <a href="#" id="menu-iphone" onclick="loadMarkdown('iPhone Security Setup Guide.md', 'menu-iphone'); return false;" class="menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l border-transparent text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 -ml-[1px]">
                             Thiết lập bảo mật iPhone
                         </a>
                     </div>
@@ -130,119 +133,132 @@
                 </div>
             </div>
 
-            <!-- Vùng cuộn chứa toàn bộ giao diện bài viết cũ -->
-            <div class="flex-1 overflow-y-auto w-full relative">
+            <!-- Vùng cuộn chứa toàn bộ giao diện bài viết -->
+            <div id="scroll-container" class="flex-1 overflow-y-auto w-full relative scroll-smooth">
                 
-                <!-- Header / Cover Image -->
-                <header class="w-full h-56 md:h-72 bg-cover bg-center relative" style="background-image: url('https://i.imgur.com/VrYNuWo.jpeg');">
-                    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/80"></div>
-                </header>
+                <!-- VÙNG 1: TRANG CHỦ (Mặc định hiện) -->
+                <div id="home-content" class="w-full">
+                    <!-- Header / Cover Image -->
+                    <header class="w-full h-56 md:h-72 bg-cover bg-center relative" style="background-image: url('https://i.imgur.com/VrYNuWo.jpeg');">
+                        <div class="absolute inset-0 bg-gradient-to-b from-transparent to-indigo-950/80"></div>
+                    </header>
 
-                <!-- Main Content -->
-                <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10 pb-16">
-                    
-                    <!-- Intro Card -->
-                    <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-slate-100">
-                        <div class="flex items-center gap-4 mb-6">
-                            <div class="w-16 h-16 rounded-2xl shadow-sm overflow-hidden shrink-0">
-                                <img src="https://i.imgur.com/qkE7bQz.png$0" alt="Sonct's Vault" class="w-full h-full object-cover">
-                            </div>
-                            <div>
-                                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Sonct's Vault</h1>
-                                <p class="text-slate-500 font-medium mt-1">Kho lưu trữ cá nhân của <span class="text-brand-600 font-bold">Sonct</span></p>
-                            </div>
-                        </div>
+                    <!-- Main Content Trang Chủ -->
+                    <main class="max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 -mt-20 relative z-10 pb-16">
                         
-                        <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
-                            <p class="mb-4">
-                                Chào mừng bạn bước vào <strong>Sonct's Vault</strong>! Đây là nơi lưu trữ và chia sẻ các tài liệu, kiến thức được ghi chép hàng ngày từ ứng dụng Obsidian.
-                            </p>
-                            <p class="bg-purple-50 text-purple-800 p-4 rounded-xl border border-purple-100 text-base font-medium">
-                                <i class="fas fa-info-circle mr-2"></i> <strong>Lưu ý:</strong> Bạn có thể thấy một số các bài viết khác không liên quan đến nội dung bạn được chia sẻ, hãy bỏ qua chúng nếu bạn không quan tâm nhé.
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Two Columns Layout (Liên hệ & Ủng hộ) -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-                        <!-- Contact Section -->
-                        <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
-                            <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                                <i class="fas fa-address-book text-brand-500"></i>
-                                Thông tin liên hệ
-                            </h2>
-                            <div class="space-y-4 flex-grow">
-                                <a href="https://t.me/sonct988" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-blue-50 hover:bg-blue-500 transition-colors duration-300 border border-blue-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-blue-100 group-hover:bg-white/20 flex items-center justify-center text-blue-500 group-hover:text-white transition-colors">
-                                            <i class="fab fa-telegram-plane text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-blue-600/80 group-hover:text-blue-100 font-medium uppercase tracking-wider">Telegram</p>
-                                            <p class="text-blue-900 group-hover:text-white font-semibold">@sonct988</p>
-                                        </div>
-                                    </div>
-                                    <i class="fas fa-external-link-alt text-blue-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </a>
-
-                                <div class="group flex items-center justify-between p-4 rounded-xl bg-indigo-50 hover:bg-indigo-500 transition-colors duration-300 border border-indigo-100 cursor-pointer" onclick="copyText('@sonct', 'Tên Discord')">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-indigo-100 group-hover:bg-white/20 flex items-center justify-center text-indigo-500 group-hover:text-white transition-colors">
-                                            <i class="fab fa-discord text-xl"></i>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs text-indigo-600/80 group-hover:text-indigo-100 font-medium uppercase tracking-wider">Discord</p>
-                                            <p class="text-indigo-900 group-hover:text-white font-semibold">@sonct</p>
-                                        </div>
-                                    </div>
-                                    <button class="text-indigo-400 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
-                                        <i class="far fa-copy"></i>
-                                    </button>
+                        <!-- Intro Card -->
+                        <div class="bg-white rounded-2xl shadow-xl p-8 md:p-10 border border-slate-100">
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-16 h-16 rounded-2xl shadow-sm overflow-hidden shrink-0">
+                                    <img src="https://i.imgur.com/qkE7bQz.png" alt="Sonct's Vault" class="w-full h-full object-cover">
                                 </div>
+                                <div>
+                                    <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Sonct's Vault</h1>
+                                    <p class="text-slate-500 font-medium mt-1">Kho lưu trữ cá nhân của <span class="text-brand-600 font-bold">Sonct</span></p>
+                                </div>
+                            </div>
+                            
+                            <div class="prose max-w-none text-slate-600 leading-relaxed text-lg">
+                                <p class="mb-4">
+                                    Chào mừng bạn bước vào <strong>Sonct's Vault</strong>! Đây là nơi lưu trữ và chia sẻ các tài liệu, kiến thức được ghi chép hàng ngày từ ứng dụng Obsidian.
+                                </p>
+                                <p class="bg-purple-50 text-purple-800 p-4 rounded-xl border border-purple-100 text-base font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i> <strong>Lưu ý:</strong> Bạn có thể thấy một số các bài viết khác không liên quan đến nội dung bạn được chia sẻ, hãy bỏ qua chúng nếu bạn không quan tâm nhé.
+                                </p>
                             </div>
                         </div>
 
-                        <!-- Donate Section -->
-                        <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
-                            <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-                                <i class="fas fa-coffee text-amber-500"></i>
-                                Ủng hộ
-                            </h2>
-                            <p class="text-slate-500 text-sm mb-6">
-                                Nếu bạn thấy thứ gì đó hữu ích và muốn ủng hộ, hãy mời mình một ly trà đá nhé! ❤️
-                            </p>
-                            <div class="space-y-4 flex-grow">
-                                <div class="group flex items-center justify-between p-4 rounded-xl bg-green-50 hover:bg-green-500 transition-colors duration-300 border border-green-100 cursor-pointer" onclick="copyText('0904211988', 'Số tài khoản')">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-green-100 group-hover:bg-white/20 flex items-center justify-center text-green-600 group-hover:text-white transition-colors">
-                                            <i class="fas fa-building-columns text-lg"></i>
+                        <!-- Liên hệ & Ủng hộ -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                            <!-- Contact Section -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
+                                <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+                                    <i class="fas fa-address-book text-brand-500"></i>
+                                    Thông tin liên hệ
+                                </h2>
+                                <div class="space-y-4 flex-grow">
+                                    <a href="https://t.me/sonct988" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-blue-50 hover:bg-blue-500 transition-colors duration-300 border border-blue-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-blue-100 group-hover:bg-white/20 flex items-center justify-center text-blue-500 group-hover:text-white transition-colors">
+                                                <i class="fab fa-telegram-plane text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-blue-600/80 group-hover:text-blue-100 font-medium uppercase tracking-wider">Telegram</p>
+                                                <p class="text-blue-900 group-hover:text-white font-semibold">@sonct988</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="text-xs text-green-700/80 group-hover:text-green-100 font-medium uppercase tracking-wider">Vietinbank</p>
-                                            <p class="text-green-900 group-hover:text-white font-semibold text-lg tracking-wide">0904 211 988</p>
-                                        </div>
-                                    </div>
-                                    <button class="text-green-500 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
-                                        <i class="far fa-copy"></i>
-                                    </button>
-                                </div>
+                                        <i class="fas fa-external-link-alt text-blue-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
 
-                                <a href="https://paypal.me/sonct" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-sky-50 hover:bg-[#00457C] transition-colors duration-300 border border-sky-100">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 rounded-full bg-sky-100 group-hover:bg-white/20 flex items-center justify-center text-[#0079C1] group-hover:text-white transition-colors">
-                                            <i class="fab fa-paypal text-xl"></i>
+                                    <div class="group flex items-center justify-between p-4 rounded-xl bg-indigo-50 hover:bg-indigo-500 transition-colors duration-300 border border-indigo-100 cursor-pointer" onclick="copyText('@sonct', 'Tên Discord')">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-indigo-100 group-hover:bg-white/20 flex items-center justify-center text-indigo-500 group-hover:text-white transition-colors">
+                                                <i class="fab fa-discord text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-indigo-600/80 group-hover:text-indigo-100 font-medium uppercase tracking-wider">Discord</p>
+                                                <p class="text-indigo-900 group-hover:text-white font-semibold">@sonct</p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="text-xs text-sky-700/80 group-hover:text-sky-200 font-medium uppercase tracking-wider">Paypal</p>
-                                            <p class="text-sky-900 group-hover:text-white font-semibold">paypal.me/sonct</p>
-                                        </div>
+                                        <button class="text-indigo-400 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
+                                            <i class="far fa-copy"></i>
+                                        </button>
                                     </div>
-                                    <i class="fas fa-external-link-alt text-sky-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </a>
+                                </div>
+                            </div>
+
+                            <!-- Donate Section -->
+                            <div class="bg-white rounded-2xl shadow-lg p-8 border border-slate-100 flex flex-col h-full hover:shadow-xl transition-shadow duration-300">
+                                <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+                                    <i class="fas fa-coffee text-amber-500"></i>
+                                    Ủng hộ
+                                </h2>
+                                <p class="text-slate-500 text-sm mb-6">
+                                    Nếu bạn thấy thứ gì đó hữu ích và muốn ủng hộ, hãy mời mình một ly trà đá nhé! ❤️
+                                </p>
+                                <div class="space-y-4 flex-grow">
+                                    <div class="group flex items-center justify-between p-4 rounded-xl bg-green-50 hover:bg-green-500 transition-colors duration-300 border border-green-100 cursor-pointer" onclick="copyText('0904211988', 'Số tài khoản')">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-green-100 group-hover:bg-white/20 flex items-center justify-center text-green-600 group-hover:text-white transition-colors">
+                                                <i class="fas fa-building-columns text-lg"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-green-700/80 group-hover:text-green-100 font-medium uppercase tracking-wider">Vietinbank</p>
+                                                <p class="text-green-900 group-hover:text-white font-semibold text-lg tracking-wide">0904 211 988</p>
+                                            </div>
+                                        </div>
+                                        <button class="text-green-500 group-hover:text-white hover:scale-110 transition-transform" title="Sao chép">
+                                            <i class="far fa-copy"></i>
+                                        </button>
+                                    </div>
+
+                                    <a href="https://paypal.me/sonct" target="_blank" class="group flex items-center justify-between p-4 rounded-xl bg-sky-50 hover:bg-[#00457C] transition-colors duration-300 border border-sky-100">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-full bg-sky-100 group-hover:bg-white/20 flex items-center justify-center text-[#0079C1] group-hover:text-white transition-colors">
+                                                <i class="fab fa-paypal text-xl"></i>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-sky-700/80 group-hover:text-sky-200 font-medium uppercase tracking-wider">Paypal</p>
+                                                <p class="text-sky-900 group-hover:text-white font-semibold">paypal.me/sonct</p>
+                                            </div>
+                                        </div>
+                                        <i class="fas fa-external-link-alt text-sky-400 group-hover:text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                                    </a>
+                                </div>
                             </div>
                         </div>
+                    </main>
+                </div>
+
+                <!-- VÙNG 2: HIỂN THỊ MARKDOWN (Mặc định ẩn) -->
+                <div id="markdown-container" class="hidden w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-12 min-h-[500px]">
+                        <!-- Cấu hình chuẩn Tailwind Typography để CSS cho Markdown -->
+                        <div id="markdown-content" class="prose prose-slate prose-brand prose-img:rounded-xl prose-img:shadow-md max-w-none prose-a:text-brand-600 hover:prose-a:text-brand-500 prose-headings:text-slate-800">
+                            <!-- Nội dung bài viết sẽ được JS nhúng vào đây -->
+                        </div>
                     </div>
-                </main>
+                </div>
 
                 <footer class="text-center py-6 text-slate-400 text-sm mt-auto border-t border-slate-200/60 bg-white">
                     <p>&copy; 2026 Sonct's Vault.</p>
@@ -253,14 +269,93 @@
 
     <!-- Scripts -->
     <script>
+        // CẤU HÌNH VÀ XỬ LÝ CLICK ĐỘNG
+        function resetMenu() {
+            // Đặt lại trang chủ về mặc định
+            const homeBtn = document.getElementById('menu-home');
+            homeBtn.className = 'menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-slate-600 hover:bg-slate-200/50';
+            
+            // Đặt lại tất cả các item trong folder về mặc định
+            const folderItems = document.querySelectorAll('.folder-item');
+            folderItems.forEach(item => {
+                item.className = 'menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l text-slate-600 hover:text-slate-900 hover:bg-slate-200/50 border-transparent -ml-[1px]';
+            });
+        }
+
+        function loadHome() {
+            resetMenu();
+            // Highlight nút trang chủ
+            const homeBtn = document.getElementById('menu-home');
+            homeBtn.className = 'menu-item flex items-center gap-2.5 px-2 py-1.5 rounded-md transition-colors group text-brand-600 bg-brand-50';
+            homeBtn.querySelector('i').classList.replace('text-slate-400', 'text-brand-500');
+            
+            // Hiện Trang Chủ, Ẩn Khung Markdown
+            document.getElementById('home-content').classList.remove('hidden');
+            document.getElementById('markdown-container').classList.add('hidden');
+            
+            // Cuộn lên đầu
+            document.getElementById('scroll-container').scrollTo(0, 0);
+
+            // Tự đóng menu trên điện thoại
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
+        async function loadMarkdown(filename, elementId) {
+            resetMenu();
+            // Đặt lại icon trang chủ thành xám
+            document.querySelector('#menu-home i').classList.replace('text-brand-500', 'text-slate-400');
+
+            // Highlight nút vừa click
+            const activeItem = document.getElementById(elementId);
+            if (activeItem) {
+                activeItem.className = 'menu-item folder-item block py-1.5 pl-3 text-sm rounded-r-md transition-colors border-l font-medium text-brand-600 bg-brand-50/50 hover:bg-brand-50 border-brand-500 -ml-[1.5px] border-l-[3px]';
+            }
+
+            // Ẩn Trang Chủ, Hiện Khung Markdown
+            const homeContent = document.getElementById('home-content');
+            const markdownContainer = document.getElementById('markdown-container');
+            const markdownContent = document.getElementById('markdown-content');
+
+            homeContent.classList.add('hidden');
+            markdownContainer.classList.remove('hidden');
+            
+            // Hiển thị vòng quay loading
+            markdownContent.innerHTML = '<div class="flex justify-center items-center h-40"><i class="fas fa-spinner fa-spin text-3xl text-brand-500"></i></div>';
+
+            try {
+                // Fetch file .md từ server (hoặc GitHub)
+                const response = await fetch(encodeURI(filename));
+                if (!response.ok) throw new Error('Không tìm thấy file');
+                const text = await response.text();
+                
+                // Tiền xử lý: Xóa phần YAML Header (--- ... ---) của Obsidian để tránh render lỗi
+                const cleanText = text.replace(/^---[\s\S]+?---\n/, '');
+                
+                // Dịch sang HTML bằng marked.js
+                markdownContent.innerHTML = marked.parse(cleanText);
+            } catch (error) {
+                markdownContent.innerHTML = `
+                    <div class="text-red-500 text-center py-10">
+                        <i class="fas fa-exclamation-triangle text-4xl mb-4"></i>
+                        <p>Không thể tải nội dung.</p>
+                        <p class="text-sm text-slate-500 mt-2">Vui lòng đảm bảo file <b>${filename}</b> đã được upload lên cùng thư mục trên GitHub.</p>
+                    </div>`;
+                console.error(error);
+            }
+
+            // Cuộn lên đầu trang
+            document.getElementById('scroll-container').scrollTo(0, 0);
+
+            // Tự đóng menu trên điện thoại
+            if(window.innerWidth < 768) toggleSidebar();
+        }
+
         // Logic Đóng/Mở thư mục Sidebar (Accordion)
         function toggleFolder() {
             const content = document.getElementById('folder-content');
             const icon = document.getElementById('folder-icon');
             
-            // Dùng class hidden của tailwind
             content.classList.toggle('hidden');
-            // Xoay mũi tên 90 độ
             icon.classList.toggle('-rotate-90');
         }
 
@@ -270,11 +365,9 @@
             const overlay = document.getElementById('sidebar-overlay');
             
             if (window.innerWidth < 768) {
-                // Trên Mobile: Trượt ra/vào và hiện lớp phủ
                 sidebar.classList.toggle('-translate-x-full');
                 overlay.classList.toggle('hidden');
             } else {
-                // Trên Desktop: Ẩn/Hiện bằng cách thêm/xóa class md:hidden
                 sidebar.classList.toggle('md:hidden');
             }
         }
